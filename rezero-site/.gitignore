@@ -29,3 +29,6 @@ build_err.txt
 *.njsproj
 *.sln
 *.sw?
+
+# Agents
+../.agents/
