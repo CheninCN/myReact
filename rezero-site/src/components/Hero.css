@@ -254,6 +254,7 @@
   justify-content: center;
   gap: 32px;
   animation: fadeIn 1s ease 1.1s both;
+  padding-bottom: 80px;
 }
 
 .hero__stat {
@@ -318,5 +319,6 @@
 
   .hero__stats {
     gap: 20px;
+    padding-bottom: 72px;
   }
 }
