@@ -146,14 +146,14 @@
   pointer-events: none;
 }
 
-/* ── Portrait ── */
+/* ── Portrait ── 左侧图片区域（直接填充） */
 .chars__portrait {
   position: relative;
   flex-shrink: 0;
-  width: 260px;
+  width: 300px;
   height: 420px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   overflow: hidden;
   border-radius: 20px 0 0 20px;
@@ -164,29 +164,19 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: bottom center;
+  object-position: center center;
   display: block;
   filter: drop-shadow(0 4px 24px rgba(0,0,0,0.6));
+  z-index: 2;
 }
 
 .chars__portrait-fallback {
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  border: 2px solid;
+  border: 3px solid;
   background: rgba(0, 0, 0, 0.3);
-  margin-bottom: 60px;
-}
-
-/* Bust-only: c/ image is a head+chest crop — center it */
-.chars__portrait--bust {
-  align-items: center;
-}
-
-.chars__portrait-img--bust {
-  object-position: center center;
-  width: 90%;
-  height: 90%;
+  z-index: 2;
 }
 
 .chars__portrait-glow {
@@ -198,7 +188,7 @@
   pointer-events: none;
 }
 
-/* ── Info ── */
+/* ── Info ── 右侧文字区域 */
 .chars__info {
   position: relative;
   z-index: 1;
@@ -207,6 +197,28 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow: hidden;
+}
+
+/* 全身图背景层 */
+.chars__info-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: right center;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(1px);
+}
+
+.chars__info > * {
+  position: relative;
+  z-index: 1;
 }
 
 .chars__info-role {
@@ -297,8 +309,13 @@
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .chars__portrait {
-    width: 200px;
+    width: 240px;
     height: 380px;
+  }
+
+  .chars__portrait-fallback {
+    width: 140px;
+    height: 140px;
   }
 
   .chars__info {
@@ -318,20 +335,23 @@
 
   .chars__portrait {
     width: 100%;
-    height: 340px;
+    height: 320px;
     border-radius: 20px 20px 0 0;
   }
 
-  .chars__portrait-img {
-    object-position: bottom center;
-    max-height: 340px;
-    width: auto;
-    margin: 0 auto;
+  .chars__portrait-fallback {
+    width: 160px;
+    height: 160px;
   }
 
   .chars__info {
     padding: 24px 24px 32px;
     text-align: center;
+  }
+
+  .chars__info-bg {
+    background-position: center bottom;
+    opacity: 0.08;
   }
 
   .chars__info-meta-row {

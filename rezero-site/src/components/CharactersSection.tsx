@@ -192,14 +192,14 @@ export default function CharactersSection() {
             '--char-color-light': meta.colorLight,
           } as React.CSSProperties}
         >
-          {/* Portrait */}
-          <div className={`chars__portrait ${meta.bustOnly ? 'chars__portrait--bust' : ''}`}>
-            {!meta.noImage && !imgError[`full-${activeId}`] ? (
+          {/* Portrait - 左侧圆形头像 */}
+          <div className="chars__portrait">
+            {!meta.noImage && !imgError[`portrait-${activeId}`] ? (
               <img
-                src={meta.fullUrl}
+                src={meta.portraitUrl}
                 alt={t(`characters.list.${activeId}.name`)}
-                className={`chars__portrait-img ${meta.bustOnly ? 'chars__portrait-img--bust' : ''}`}
-                onError={() => handleImgError(`full-${activeId}`)}
+                className="chars__portrait-img"
+                onError={() => handleImgError(`portrait-${activeId}`)}
               />
             ) : (
               <div
@@ -210,8 +210,17 @@ export default function CharactersSection() {
             <div className="chars__portrait-glow" style={{ background: `radial-gradient(ellipse at bottom, ${meta.color}30, transparent 70%)` }} />
           </div>
 
-          {/* Info */}
+          {/* Info - 右侧文字区域，全身图作为背景 */}
           <div className="chars__info">
+            {/* 全身图背景层 */}
+            {!meta.noImage && !imgError[`full-${activeId}`] && (
+              <div 
+                className="chars__info-bg"
+                style={{
+                  backgroundImage: `url(${meta.fullUrl})`,
+                }}
+              />
+            )}
             <div className="chars__info-role">{t(`characters.list.${activeId}.role`)}</div>
             <h3 className="chars__info-name">{t(`characters.list.${activeId}.name`)}</h3>
             <p className="chars__info-name-en">{t(`characters.list.${activeId}.nameEn`)}</p>
