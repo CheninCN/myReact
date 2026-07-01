@@ -31,6 +31,7 @@
   display: flex;
   align-items: baseline;
   gap: 2px;
+  flex-shrink: 0;
 }
 
 .nav__logo-re {
@@ -64,6 +65,7 @@
   list-style: none;
 }
 
+/* Base link — transparent border prevents layout shift on active */
 .nav__link {
   font-family: var(--font-sans);
   font-size: 0.9rem;
@@ -72,6 +74,7 @@
   text-decoration: none;
   padding: 8px 14px;
   border-radius: 6px;
+  border: 1px solid transparent;
   transition: all var(--transition-fast);
   letter-spacing: 0.05em;
 }
@@ -79,27 +82,32 @@
 .nav__link:hover {
   color: var(--color-blue-light);
   background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.15);
 }
 
-.nav__cta {
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-white);
-  text-decoration: none;
-  padding: 8px 20px;
-  border: 1px solid rgba(37, 99, 235, 0.6);
-  border-radius: 6px;
-  background: rgba(37, 99, 235, 0.15);
-  transition: all var(--transition-fast);
-  letter-spacing: 0.08em;
-  margin-left: 8px;
+/* Active section — semi-transparent blue rectangle */
+.nav__link--active {
+  color: var(--color-blue-light);
+  background: rgba(37, 99, 235, 0.18);
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.15);
 }
 
-.nav__cta:hover {
-  background: rgba(37, 99, 235, 0.35);
-  border-color: var(--color-blue-accent);
-  box-shadow: var(--shadow-glow-blue);
+.nav__link--active:hover {
+  background: rgba(37, 99, 235, 0.28);
+  border-color: rgba(37, 99, 235, 0.55);
+}
+
+/* Language switcher in mobile drawer — hidden on desktop */
+.nav__lang-item {
+  display: none;
+}
+
+/* Right-side cluster: lang switcher (desktop) + hamburger */
+.nav__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .nav__hamburger {
@@ -132,9 +140,15 @@
   transform: translateY(-7px) rotate(-45deg);
 }
 
+/* ── Mobile ── */
 @media (max-width: 768px) {
   .nav__hamburger {
     display: flex;
+  }
+
+  /* Hide the desktop lang switcher inside nav__right on mobile */
+  .nav__right > .lang-switcher {
+    display: none;
   }
 
   .nav__links {
@@ -159,12 +173,6 @@
   .nav__link {
     font-size: 1.1rem;
     padding: 12px 20px;
-  }
-
-  .nav__cta {
-    font-size: 1rem;
-    margin-left: 0;
-    padding: 12px 28px;
   }
 
   /* Show lang switcher inside the mobile drawer */
