@@ -1,0 +1,220 @@
+.story {
+  position: relative;
+  padding: 120px 32px;
+  background: linear-gradient(180deg,
+    var(--color-navy) 0%,
+    #080c18 50%,
+    var(--color-navy) 100%);
+  overflow: hidden;
+}
+
+.story::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, rgba(37, 99, 235, 0.2), transparent);
+}
+
+.story__inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.story__header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.story__label {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  color: var(--color-blue-accent);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding: 4px 16px;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 20px;
+}
+
+.story__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  color: var(--color-white);
+  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+}
+
+.story__intro {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.9;
+}
+
+/* ── Power Card ── */
+.story__power-card {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  background: linear-gradient(135deg,
+    rgba(13, 27, 62, 0.8) 0%,
+    rgba(26, 47, 110, 0.4) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 16px;
+  padding: 36px 40px;
+  margin-bottom: 64px;
+  position: relative;
+  overflow: hidden;
+  animation: borderGlow 4s ease-in-out infinite;
+}
+
+.story__power-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.story__power-icon {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  animation: crystalSpin 20s linear infinite;
+}
+
+.story__power-icon svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 12px rgba(37, 99, 235, 0.6));
+}
+
+.story__power-title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-blue-light);
+  margin-bottom: 10px;
+  letter-spacing: 0.1em;
+}
+
+.story__power-desc {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1.9;
+}
+
+.story__power-note {
+  display: block;
+  margin-top: 8px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: 0.88rem;
+}
+
+/* ── Arcs ── */
+.story__arcs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.story__arc {
+  position: relative;
+  background: rgba(10, 14, 26, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 32px;
+  overflow: hidden;
+  transition: all var(--transition-mid);
+  cursor: default;
+}
+
+.story__arc:hover {
+  border-color: rgba(var(--arc-color), 0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.story__arc:hover .story__arc-glow {
+  opacity: 1;
+}
+
+.story__arc-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--arc-color) 10%, transparent), transparent 60%);
+  opacity: 0;
+  transition: opacity var(--transition-mid);
+  pointer-events: none;
+}
+
+.story__arc-number {
+  font-family: var(--font-serif);
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.04);
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  line-height: 1;
+  user-select: none;
+}
+
+.story__arc-content {
+  position: relative;
+  z-index: 1;
+}
+
+.story__arc-subtitle {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  color: var(--arc-color, var(--color-blue-accent));
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.story__arc-title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-white);
+  letter-spacing: 0.05em;
+  margin-bottom: 14px;
+}
+
+.story__arc-desc {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.85;
+}
+
+@media (max-width: 768px) {
+  .story {
+    padding: 80px 20px;
+  }
+
+  .story__power-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 28px 24px;
+  }
+
+  .story__arcs {
+    grid-template-columns: 1fr;
+  }
+}

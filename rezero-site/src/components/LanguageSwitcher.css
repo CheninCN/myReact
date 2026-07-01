@@ -1,0 +1,118 @@
+.lang-switcher {
+  position: relative;
+  z-index: 100;
+}
+
+.lang-switcher__trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.lang-switcher__trigger:hover {
+  background: rgba(37, 99, 235, 0.12);
+  border-color: rgba(96, 165, 250, 0.5);
+  color: var(--color-white);
+}
+
+.lang-switcher--open .lang-switcher__trigger {
+  background: rgba(37, 99, 235, 0.15);
+  border-color: var(--color-blue-accent);
+  color: var(--color-white);
+}
+
+.lang-switcher__flag {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.lang-switcher__label {
+  letter-spacing: 0.02em;
+}
+
+.lang-switcher__chevron {
+  width: 14px;
+  height: 14px;
+  transition: transform var(--transition-fast);
+  opacity: 0.7;
+}
+
+.lang-switcher--open .lang-switcher__chevron {
+  transform: rotate(180deg);
+}
+
+/* Dropdown */
+.lang-switcher__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background: rgba(8, 12, 22, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  border-radius: 10px;
+  list-style: none;
+  padding: 6px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(37, 99, 235, 0.1);
+  animation: fadeInUp 0.18s ease;
+}
+
+.lang-switcher__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+}
+
+.lang-switcher__option:hover {
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--color-white);
+}
+
+.lang-switcher__option--active {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--color-blue-light);
+}
+
+.lang-switcher__option-flag {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.lang-switcher__option-label {
+  flex: 1;
+  font-weight: 500;
+}
+
+.lang-switcher__check {
+  width: 14px;
+  height: 14px;
+  color: var(--color-blue-accent);
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .lang-switcher__dropdown {
+    right: auto;
+    left: 0;
+  }
+}

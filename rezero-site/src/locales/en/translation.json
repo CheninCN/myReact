@@ -1,0 +1,117 @@
+{
+  "nav": {
+    "story": "Story",
+    "characters": "Characters",
+    "episodes": "Episodes",
+    "world": "World",
+    "official": "Official Site",
+    "menuLabel": "Menu"
+  },
+  "hero": {
+    "tagline": "A Hero's Tale Starting From Zero",
+    "titleMain": "Starting Life in",
+    "titleSub": "Another World",
+    "romaji": "Re:ZERO − Starting Life in Another World",
+    "desc1": "Natsuki Subaru, an ordinary high school student, is suddenly summoned to another world.",
+    "desc2": "His only power—",
+    "descHighlight": "\"Return by Death\"",
+    "desc3": ".",
+    "desc4": "No matter how many times he dies, he rises again for those he loves.",
+    "btnStory": "View Story",
+    "btnChars": "Characters",
+    "statSeasons": "Anime Seasons",
+    "statVolumes": "Novel Volumes",
+    "statAired": "Aired Since",
+    "scroll": "Scroll"
+  },
+  "story": {
+    "label": "STORY",
+    "title": "Story",
+    "intro": "The tale of a boy who possesses the power of \"Return by Death\" and fights again and again for those he loves.",
+    "powerTitle": "Return by Death",
+    "powerDesc1": "The unique magic ability possessed by Natsuki Subaru.",
+    "powerDesc2": "The power to rewind time to a specific point upon death—an endless cycle of resurrection.",
+    "powerNote": "── Yet the pain and memories never fade.",
+    "arcs": {
+      "arc01": { "title": "Origins", "subtitle": "The Summoned Boy", "desc": "An ordinary high schooler with nothing special, Natsuki Subaru is suddenly summoned to another world. There he meets a silver-haired girl named Emilia. To protect her, Subaru repeats \"Return by Death\" countless times." },
+      "arc02": { "title": "The Mansion", "subtitle": "Tragedy at Roswaal's Estate", "desc": "Repeated tragedy unfolds inside the seemingly peaceful Roswaal mansion. Experiencing death over and over to protect his friends, Subaru inches toward the truth." },
+      "arc03": { "title": "White Whale", "subtitle": "Battle Against the Demon Beast", "desc": "A desperate clash against the White Whale, the invincible demon beast. Subaru leads his allies to challenge the creature that has never been defeated in history." },
+      "arc04": { "title": "The Sanctuary", "subtitle": "The Sanctuary and the Witch's Shadow", "desc": "A story of trials unfolding in a cursed sanctuary. As the shadow of the Jealousy Witch Satella closes in, Subaru faces his greatest ordeal." }
+    }
+  },
+  "characters": {
+    "label": "CHARACTERS",
+    "title": "Characters",
+    "abilityLabel": "Ability",
+    "list": {
+      "subaru": { "name": "Natsuki Subaru", "role": "Protagonist", "ability": "Return by Death", "desc": "A boy summoned from the ordinary world. Armed with stubborn grit and strong bonds with his allies, he rises no matter how many times he falls.", "traits": ["Determination", "Never Gives Up", "Loyal Friend"] },
+      "emilia": { "name": "Emilia", "role": "Royal Candidate", "ability": "Ice Magic", "desc": "A half-elf girl with silver hair and purple eyes. A spirit user with a pure and strong heart who strives earnestly as a royal candidacy contestant.", "traits": ["Pure-hearted", "Seeks Strength", "Spirit User"] },
+      "rem": { "name": "Rem", "role": "Roswaal's Maid", "ability": "Water Magic / Oni Form", "desc": "The younger of the twins. An oni maid who supports Subaru with unwavering devotion. Known as the \"Water Maiden\", she is also a powerful warrior.", "traits": ["Devoted", "Selfless", "Powerful Fighter"] },
+      "ram": { "name": "Ram", "role": "Roswaal's Maid", "ability": "Wind Magic", "desc": "The older of the twins. An oni maid with cool composure and high pride. A skilled head maid with deep loyalty to Roswaal.", "traits": ["Composed", "Prideful", "Loyal"] },
+      "beatrice": { "name": "Beatrice", "role": "Guardian of the Forbidden Library", "ability": "Shamak Magic", "desc": "A girl characterized by her long golden drill hair. An ancient spirit who has guarded the Forbidden Library for centuries. She recognizes Subaru as her \"promised person\".", "traits": ["Ancient Spirit", "Tsundere", "Highly Intelligent"] },
+      "felt": { "name": "Felt", "role": "Royal Candidate", "ability": "Superhuman Speed", "desc": "A wild girl from the slums. Though named as a royal candidacy contestant, she continuously rebels against the existing aristocratic system.", "traits": ["Rebellious", "Lightning Fast", "Free-spirited"] }
+    }
+  },
+  "episodes": {
+    "label": "EPISODES",
+    "title": "Episodes",
+    "subtitle": "Unforgettable Scenes",
+    "episodesUnit": " eps",
+    "featuredTitle": "Featured Episodes",
+    "seasons": {
+      "S1": { "desc": "From the isekai summoning to royal capital intrigue and the White Whale hunt. The origin where Subaru's \"Return by Death\" is first depicted." },
+      "S2": { "desc": "Trials in the Sanctuary and the truth of the witch. The emotional second chapter where Subaru and Emilia's bond deepens." },
+      "S3": { "desc": "New threats and adventure with allies. The latest season where the world of Re:Zero expands even further." }
+    },
+    "list": {
+      "s1e01": { "title": "Re:ZERO −Starting Life in Another World−", "note": "Summoning" },
+      "s1e06": { "title": "The Meaning of Disgrace", "note": "Return by Death Awakens" },
+      "s1e13": { "title": "A Reunion Fitting for a Beginning", "note": "Emotional Reunion" },
+      "s1e18": { "title": "5th Time Killing", "note": "White Whale Battle" },
+      "s1e25": { "title": "Each One's Promise", "note": "Final Battle" },
+      "s2e01": { "title": "The Selection of the False King", "note": "Season 2 Opens" },
+      "s2e13": { "title": "The Sanctuary and the Witch of Greed", "note": "Greatest Trial" },
+      "s2e25": { "title": "His Return", "note": "Emotional Finale" },
+      "s3e01": { "title": "Frozen Bonds", "note": "Season 3 Opens" },
+      "s3e12": { "title": "The Moment of Decision", "note": "New Journey" }
+    }
+  },
+  "world": {
+    "label": "WORLD",
+    "title": "World",
+    "subtitle": "The Kingdom of Lugunica and the World of Witches",
+    "witchesTitle": "The Seven Witches",
+    "witchesDesc": "Seven witches who greatly influenced the world. Each bears the name of one of the seven deadly sins and claimed many lives 400 years ago.",
+    "quote": "\"Welcome back, Subaru.\"",
+    "quoteSource": "── Rem, Re:ZERO Episode 18",
+    "locations": {
+      "lugnica": { "title": "Kingdom of Lugunica", "desc": "The primary setting of the story. A kingdom where four royal candidacy contestants compete in the royal selection." },
+      "sanctuary": { "title": "The Sanctuary", "desc": "A hidden barrier land within Roswaal's forest. Those with mixed blood are bound by the barrier." },
+      "whaleWaters": { "title": "Sea of the White Whale", "desc": "A cursed misty sea where the invincible demon beast White Whale roams. Countless adventurers have lost their lives here." },
+      "witchCult": { "title": "Witch Cult", "desc": "A secret society that worships the Jealousy Witch Satella. The Sin Archbishops bearing the names of deadly sins threaten humanity." },
+      "fortuna": { "title": "Elior Forest", "desc": "A frozen forest where Emilia was born and raised. A place where past tragedies still slumber." },
+      "library": { "title": "Forbidden Library", "desc": "An infinite library beneath Roswaal's mansion. The secret space Beatrice has guarded for hundreds of years." }
+    },
+    "witches": {
+      "satella": { "title": "Witch of Jealousy", "name": "Satella" },
+      "echidna": { "title": "Witch of Greed", "name": "Echidna" },
+      "typhon": { "title": "Witch of Pride", "name": "Typhon" },
+      "daphne": { "title": "Witch of Gluttony", "name": "Daphne" },
+      "sekhmet": { "title": "Witch of Sloth", "name": "Sekhmet" },
+      "minerva": { "title": "Witch of Wrath", "name": "Minerva" },
+      "carmilla": { "title": "Witch of Lust", "name": "Carmilla" }
+    }
+  },
+  "footer": {
+    "logoTitle": "Starting Life in Another World",
+    "author": "Author: Tappei Nagatsuki · Illustration: Shin'ichirō Ōtsuka",
+    "publisher": "Published by MF Bunko J (KADOKAWA)",
+    "top": "Top",
+    "story": "Story",
+    "characters": "Characters",
+    "episodes": "Episodes",
+    "world": "World",
+    "quote": "\"Starting from zero, my life in another world.\"",
+    "copy": "© 2024 Re:ZERO Official Fan Site — Made with React"
+  }
+}

@@ -1,0 +1,134 @@
+/* ===== Re:Zero 公式サイト - Global Styles ===== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-navy: #0a0e1a;
+  --color-deep: #060910;
+  --color-blue-dark: #0d1b3e;
+  --color-blue-mid: #1a2f6e;
+  --color-blue-accent: #2563eb;
+  --color-blue-light: #60a5fa;
+  --color-ice: #a5c8f5;
+  --color-white: #f0f4ff;
+  --color-cream: #e8e0d5;
+  --color-gold: #d4a843;
+  --color-gold-light: #f0c96b;
+  --color-red: #c0392b;
+  --color-red-accent: #e74c3c;
+  --color-purple: #6b21a8;
+  --color-purple-light: #a855f7;
+  --color-witch-purple: #4b1d8f;
+  --color-emilia-white: #dce8ff;
+  --color-ram-pink: #f9a8d4;
+  --color-rem-blue: #93c5fd;
+  --color-beatrice-gold: #fbbf24;
+  --color-felt-green: #4ade80;
+  --color-text-primary: #e8eaf0;
+  --color-text-secondary: #9ba8c0;
+  --color-text-muted: #5a6580;
+
+  --font-serif: 'Noto Serif JP', serif;
+  --font-sans: 'Noto Sans JP', sans-serif;
+
+  --transition-fast: 0.2s ease;
+  --transition-mid: 0.4s ease;
+  --transition-slow: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+
+  --shadow-glow-blue: 0 0 30px rgba(37, 99, 235, 0.4);
+  --shadow-glow-gold: 0 0 20px rgba(212, 168, 67, 0.5);
+  --shadow-glow-purple: 0 0 25px rgba(107, 33, 168, 0.5);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-navy);
+  color: var(--color-text-primary);
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-blue-mid);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-blue-accent);
+}
+
+/* Selection */
+::selection {
+  background: rgba(37, 99, 235, 0.4);
+  color: var(--color-white);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(37, 99, 235, 0.7); }
+}
+
+@keyframes crystalSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes snowfall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+@keyframes witchHaze {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(37, 99, 235, 0.4); }
+  50% { border-color: rgba(96, 165, 250, 0.9); }
+}

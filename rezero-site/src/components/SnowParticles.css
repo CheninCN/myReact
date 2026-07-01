@@ -1,0 +1,18 @@
+.snow-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.snow-particle {
+  position: absolute;
+  top: -10px;
+  border-radius: 50%;
+  background: rgba(200, 220, 255, 0.8);
+  animation: snowfall linear infinite;
+}

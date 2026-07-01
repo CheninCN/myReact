@@ -1,0 +1,259 @@
+.world {
+  padding: 120px 32px;
+  background: linear-gradient(180deg,
+    var(--color-navy) 0%,
+    rgba(13, 27, 62, 0.2) 50%,
+    var(--color-navy) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.world__inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.world__header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.world__label {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  color: var(--color-blue-accent);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding: 4px 16px;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 20px;
+}
+
+.world__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  color: var(--color-white);
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.world__subtitle {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+}
+
+/* ── Grid ── */
+.world__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 60px;
+}
+
+.world__item {
+  padding: 28px;
+  background: rgba(10, 14, 26, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: all var(--transition-mid);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.world__item::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--world-color, var(--color-blue-accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-mid);
+}
+
+.world__item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(10, 14, 26, 0.8);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.world__item:hover::before {
+  transform: scaleX(1);
+}
+
+.world__item-icon {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 0 10px var(--world-color, var(--color-blue-accent)));
+}
+
+.world__item-title {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-white);
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.world__item-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+}
+
+/* ── Witches ── */
+.world__witches {
+  background: rgba(75, 29, 143, 0.06);
+  border: 1px solid rgba(107, 33, 168, 0.2);
+  border-radius: 16px;
+  padding: 44px;
+  margin-bottom: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.world__witches::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(107, 33, 168, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.world__witches-header {
+  margin-bottom: 32px;
+}
+
+.world__witches-title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-white);
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+.world__witches-desc {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+  max-width: 600px;
+}
+
+.world__witches-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.world__witch {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid;
+  border-color: color-mix(in srgb, var(--witch-color) 40%, transparent);
+  border-radius: 10px;
+  transition: all var(--transition-fast);
+  cursor: default;
+}
+
+.world__witch:hover {
+  background: color-mix(in srgb, var(--witch-color) 10%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--witch-color) 20%, transparent);
+}
+
+.world__witch-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--witch-color);
+  margin-bottom: 4px;
+}
+
+.world__witch-name {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+/* ── Quote ── */
+.world__quote {
+  text-align: center;
+  padding: 52px 40px;
+  background: linear-gradient(135deg,
+    rgba(13, 27, 62, 0.4) 0%,
+    rgba(26, 47, 110, 0.2) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 16px;
+  position: relative;
+}
+
+.world__quote::before {
+  content: '❝';
+  position: absolute;
+  top: 20px;
+  left: 36px;
+  font-size: 4rem;
+  color: rgba(37, 99, 235, 0.15);
+  line-height: 1;
+  font-family: Georgia, serif;
+}
+
+.world__quote p {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--color-white);
+  margin-bottom: 16px;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 30px rgba(37, 99, 235, 0.4);
+}
+
+.world__quote footer {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 1024px) {
+  .world__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .world {
+    padding: 80px 20px;
+  }
+
+  .world__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .world__witches {
+    padding: 28px 20px;
+  }
+
+  .world__quote {
+    padding: 40px 24px;
+  }
+}
