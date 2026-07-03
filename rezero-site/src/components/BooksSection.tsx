@@ -15,6 +15,7 @@ interface BooksSectionProps {
 
 const TOTAL_BOOKS = 45
 const PAGE_SIZE = 10
+const BASE = `${import.meta.env.BASE_URL}online-books/`
 
 export default function BooksSection({ onSelectBook }: BooksSectionProps) {
   const { t } = useTranslation()
@@ -26,14 +27,14 @@ export default function BooksSection({ onSelectBook }: BooksSectionProps) {
       return {
         id: bookId,
         title: `${t('books.book')} ${bookId}`,
-        cover: '/online-books/covers/test.jpeg',
-        epubPath: '/online-books/books/test.epub',
+        cover: `${BASE}covers/test.jpeg`,
+        epubPath: `${BASE}books/test.epub`,
       }
     }
     return {
       id: bookId,
       title: `${t('books.book')} ${bookId}`,
-      cover: '/online-books/covers/common.png',
+      cover: `${BASE}covers/common.png`,
       epubPath: null,
     }
   })
