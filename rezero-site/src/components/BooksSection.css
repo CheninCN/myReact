@@ -1,0 +1,143 @@
+.books-section {
+  padding: 6rem 2rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
+  min-height: 100vh;
+}
+
+.books-section__container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.books-section__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+.books-section__subtitle {
+  font-size: 1.1rem;
+  color: #aaa;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.books-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.book-card {
+  width: 180px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.book-card--clickable:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.book-card--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.book-card--disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.book-card__cover {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.book-card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book-card__title {
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.pagination__btn {
+  padding: 0.75rem 1.5rem;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination__btn:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.4);
+  transform: scale(1.05);
+}
+
+.pagination__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination__info {
+  color: #aaa;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .books-section__title {
+    font-size: 1.8rem;
+  }
+
+  .book-card {
+    width: 140px;
+  }
+
+  .book-card__cover {
+    height: 200px;
+  }
+
+  .books-grid {
+    gap: 1.5rem;
+  }
+
+  .pagination {
+    gap: 1rem;
+  }
+
+  .pagination__btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
