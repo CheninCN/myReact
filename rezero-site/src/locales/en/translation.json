@@ -5,6 +5,7 @@
     "characters": "Characters",
     "episodes": "Episodes",
     "world": "World",
+    "books": "Books",
     "official": "Official Site",
     "menuLabel": "Menu"
   },
@@ -171,6 +172,22 @@
       "minerva": { "title": "Witch of Wrath", "name": "Minerva" },
       "carmilla": { "title": "Witch of Lust", "name": "Carmilla" }
     }
+  },
+  "books": {
+    "title": "Books",
+    "subtitle": "Read EPUB eBooks Online",
+    "book": "Book",
+    "page": "Page",
+    "of": "of",
+    "prev": "Previous",
+    "next": "Next",
+    "toc": "Table of Contents",
+    "loading": "Loading eBook...",
+    "nextPage": "Next Page",
+    "prevPage": "Previous Page",
+    "hintLeft": "← Left Arrow: Next Page (Japanese-style)",
+    "hintRight": "→ Right Arrow: Previous Page",
+    "hintEsc": "Esc: Close Reader"
   },
   "footer": {
     "logoTitle": "Starting Life in Another World",

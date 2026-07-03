@@ -5,6 +5,7 @@
     "characters": "キャラクター",
     "episodes": "エピソード",
     "world": "世界観",
+    "books": "図書",
     "official": "公式サイト",
     "menuLabel": "メニュー"
   },
@@ -171,6 +172,22 @@
       "minerva":  { "title": "憤怒の魔女", "name": "憤怒のミネルヴァ" },
       "carmilla": { "title": "色欲の魔女", "name": "色欲のカーミラ" }
     }
+  },
+  "books": {
+    "title": "図書",
+    "subtitle": "EPUB電子書籍をオンラインで読む",
+    "book": "図書",
+    "page": "ページ",
+    "of": "/",
+    "prev": "前のページ",
+    "next": "次のページ",
+    "toc": "目次",
+    "loading": "電子書籍を読み込み中...",
+    "nextPage": "次のページ",
+    "prevPage": "前のページ",
+    "hintLeft": "← 左矢印：次のページ（日本式ページ送り）",
+    "hintRight": "→ 右矢印：前のページ",
+    "hintEsc": "Esc：リーダーを閉じる"
   },
   "footer": {
     "logoTitle": "ゼロから始まる異世界生活",

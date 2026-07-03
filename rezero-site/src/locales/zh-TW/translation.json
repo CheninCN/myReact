@@ -5,6 +5,7 @@
     "characters": "角色",
     "episodes": "集數",
     "world": "世界觀",
+    "books": "書籍",
     "official": "官方網站",
     "menuLabel": "選單"
   },
@@ -171,6 +172,22 @@
       "minerva":  { "title": "憤怒的魔女", "name": "憤怒的米涅娃" },
       "carmilla": { "title": "色欲的魔女", "name": "色欲的卡蜜拉" }
     }
+  },
+  "books": {
+    "title": "書籍",
+    "subtitle": "線上閱讀EPUB電子書",
+    "book": "書籍",
+    "page": "第",
+    "of": "頁，共",
+    "prev": "上一頁",
+    "next": "下一頁",
+    "toc": "目錄",
+    "loading": "正在載入電子書...",
+    "nextPage": "下一頁",
+    "prevPage": "上一頁",
+    "hintLeft": "← 左箭頭：翻到下一頁（日式翻頁）",
+    "hintRight": "→ 右箭頭：翻到上一頁",
+    "hintEsc": "Esc：關閉閱讀器"
   },
   "footer": {
     "logoTitle": "從零開始的異世界生活",

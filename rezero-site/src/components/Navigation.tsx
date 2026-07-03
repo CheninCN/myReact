@@ -15,6 +15,7 @@ export default function Navigation() {
     { path: '/characters',  id: 'characters', label: t('nav.characters') },
     { path: '/episodes',    id: 'episodes',   label: t('nav.episodes') },
     { path: '/world',       id: 'world',      label: t('nav.world') },
+    { path: '/books',       id: 'books',      label: t('nav.books') },
   ]
 
   useEffect(() => {
