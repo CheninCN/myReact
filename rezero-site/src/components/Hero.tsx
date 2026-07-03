@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import './Hero.css'
 
 export default function Hero() {
@@ -56,15 +57,15 @@ export default function Hero() {
         </p>
 
         <div className="hero__actions">
-          <a href="#story" className="hero__btn hero__btn--primary">
+          <Link to="/" className="hero__btn hero__btn--primary">
             <span>{t('hero.btnStory')}</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </a>
-          <a href="#characters" className="hero__btn hero__btn--secondary">
+          </Link>
+          <Link to="/characters" className="hero__btn hero__btn--secondary">
             <span>{t('hero.btnChars')}</span>
-          </a>
+          </Link>
         </div>
 
         <div className="hero__stats">

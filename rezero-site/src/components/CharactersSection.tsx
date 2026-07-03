@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import './CharactersSection.css'
 
-const BASE = 'https://re-zero-anime.jp/tv/assets/character'
+const BASE = '/characters'
 
 const characterIds = [
   // エミリア陣営

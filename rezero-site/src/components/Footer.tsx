@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import './Footer.css'
 
 export default function Footer() {
@@ -18,11 +19,11 @@ export default function Footer() {
         </p>
 
         <nav className="footer__nav">
-          <a href="#top" className="footer__nav-link">{t('footer.top')}</a>
-          <a href="#story" className="footer__nav-link">{t('footer.story')}</a>
-          <a href="#characters" className="footer__nav-link">{t('footer.characters')}</a>
-          <a href="#episodes" className="footer__nav-link">{t('footer.episodes')}</a>
-          <a href="#world" className="footer__nav-link">{t('footer.world')}</a>
+          <Link to="/" className="footer__nav-link">{t('footer.top')}</Link>
+          <Link to="/" className="footer__nav-link">{t('footer.story')}</Link>
+          <Link to="/characters" className="footer__nav-link">{t('footer.characters')}</Link>
+          <Link to="/episodes" className="footer__nav-link">{t('footer.episodes')}</Link>
+          <Link to="/world" className="footer__nav-link">{t('footer.world')}</Link>
         </nav>
 
         <div className="footer__divider" />
