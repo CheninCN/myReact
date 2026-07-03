@@ -56,19 +56,27 @@ body {
   line-height: 1.7;
 }
 
-/* Scrollbar */
+/* Scrollbar - hidden by default, show on hover */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-deep);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-blue-mid);
   border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-blue-accent);
+  opacity: 1;
+}
+
+/* Show scrollbar when hovering the page */
+body:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
 }
 
 /* Selection */

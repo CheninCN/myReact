@@ -132,12 +132,16 @@ export default function CharactersSection() {
 
   const handleTabClick = (id: CharId) => {
     setActiveId(id)
-    // cardRef 始终指向同一个 DOM 节点（无 key 变化），直接读取位置并滚动
-    requestAnimationFrame(() => {
+    requestAnimationFrame(async () => {
       const card = cardRef.current
       if (!card) return
-      const top = card.getBoundingClientRect().top + window.scrollY - 80
-      window.scrollTo({ top, behavior: 'smooth' })
+      const targetTop = card.getBoundingClientRect().top + window.scrollY - 80
+      const overshoot = targetTop + 180
+
+      document.documentElement.style.scrollBehavior = 'smooth'
+      await window.scrollTo({ top: overshoot })
+      await new Promise(resolve => setTimeout(resolve, 100))
+      await window.scrollTo({ top: targetTop })
     })
   }
 
