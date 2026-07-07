@@ -1,17 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Book, Rendition } from 'epubjs'
+import { Book as EpubBook, Rendition } from 'epubjs'
+import { Book } from '../types'
 import './EPUBReader.css'
 
-interface BookInfo {
-  id: string
-  title: string
-  cover: string
-  epubPath: string | null
-}
-
 interface EPUBReaderProps {
-  book: BookInfo
+  book: Book
   onClose: () => void
 }
 
@@ -30,17 +24,56 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
   const [toc, setToc] = useState<TOCItem[]>([])
   const [showToc, setShowToc] = useState(false)
   const [showControls, setShowControls] = useState(true)
-  const bookRef = useRef<Book | null>(null)
+  const bookRef = useRef<EpubBook | null>(null)
   const renditionRef = useRef<Rendition | null>(null)
   const sliderRef = useRef<HTMLInputElement>(null)
   const currentPageRef = useRef(1)
   const totalPagesRef = useRef(0)
+  const pendingNavRef = useRef<'prev' | 'next' | null>(null)
+  const isNavigatingRef = useRef(false)
+
+  const processNavigation = useCallback(async () => {
+    if (isNavigatingRef.current) return
+    if (!renditionRef.current) return
+
+    const action = pendingNavRef.current
+    if (!action) return
+
+    pendingNavRef.current = null
+    isNavigatingRef.current = true
+
+    const navPromise = action === 'prev'
+      ? renditionRef.current.prev()
+      : renditionRef.current.next()
+
+    const timeoutPromise = new Promise<void>((_, reject) =>
+      setTimeout(() => reject(new Error('Navigation timeout')), 5000)
+    )
+
+    try {
+      await Promise.race([navPromise, timeoutPromise])
+    } catch (e) {
+      console.error(`Navigation ${action} failed:`, e)
+      if (renditionRef.current) {
+        try {
+          await renditionRef.current.display()
+        } catch {
+          // recovery failed
+        }
+      }
+    } finally {
+      isNavigatingRef.current = false
+      if (pendingNavRef.current) {
+        setTimeout(() => processNavigation(), 150)
+      }
+    }
+  }, [])
 
   const loadBook = useCallback(async () => {
     if (!book.epubPath) return
 
     try {
-      const epubBook = new Book(book.epubPath)
+      const epubBook = new EpubBook(book.epubPath)
       bookRef.current = epubBook
 
       await epubBook.ready
@@ -73,7 +106,6 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
       })
       renditionRef.current = rendition
 
-      // 使用 themes 设置样式，epubjs 会正确处理 padding 与 column-width 的关系
       rendition.themes.default({
         body: {
           'background': '#fff',
@@ -107,19 +139,38 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
         h6: { 'margin': '1em 0 0.5em 0' },
       })
 
-      // hooks.content 只注入最小样式，不干扰 epubjs 分页机制
       rendition.hooks.content.register((contents: any) => {
         const doc = contents.document
         if (!doc) return
 
         const style = doc.createElement('style')
         style.textContent = `
-          body {
+          * {
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            -webkit-hyphens: none;
+            hyphens: none;
+          }
+          html, body {
             user-select: none;
             -webkit-user-select: none;
+            word-break: keep-all;
+            line-break: strict;
+            column-fill: auto;
+            orphans: 2;
+            widows: 2;
           }
-          img {
+          img, svg, video, figure, table {
+            break-inside: avoid;
             page-break-inside: avoid;
+            -webkit-column-break-inside: avoid;
+            break-after: avoid;
+            page-break-after: avoid;
+          }
+          h1, h2, h3, h4, h5, h6 {
+            break-after: avoid;
+            page-break-after: avoid;
+            -webkit-column-break-after: avoid;
           }
         `
         doc.head.appendChild(style)
@@ -133,7 +184,11 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
 
       await rendition.display()
 
-      await epubBook.locations.generate(1000)
+      await new Promise<void>((resolve) => {
+        rendition.on('rendered', () => resolve())
+      })
+
+      await epubBook.locations.generate(200)
       const total = epubBook.locations.length()
       totalPagesRef.current = total
       setTotalPages(total)
@@ -184,15 +239,13 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
   }, [showControls])
 
   const handlePrevPage = () => {
-    if (renditionRef.current) {
-      renditionRef.current.prev()
-    }
+    pendingNavRef.current = 'prev'
+    processNavigation()
   }
 
   const handleNextPage = () => {
-    if (renditionRef.current) {
-      renditionRef.current.next()
-    }
+    pendingNavRef.current = 'next'
+    processNavigation()
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -210,18 +263,40 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSliderChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const page = parseInt(e.target.value)
-    if (renditionRef.current && bookRef.current && page > 0) {
-      const cfi = bookRef.current.locations.cfiFromLocation(page - 1)
-      renditionRef.current.display(cfi)
+    if (renditionRef.current && bookRef.current && page > 0 && !isNavigatingRef.current) {
+      isNavigatingRef.current = true
+      try {
+        const cfi = bookRef.current.locations.cfiFromLocation(page - 1)
+        const displayPromise = renditionRef.current.display(cfi)
+        const timeoutPromise = new Promise<void>((_, reject) =>
+          setTimeout(() => reject(new Error('Slider navigation timeout')), 5000)
+        )
+        await Promise.race([displayPromise, timeoutPromise])
+      } catch (e) {
+        console.error('Slider change error:', e)
+      } finally {
+        isNavigatingRef.current = false
+      }
     }
   }
 
-  const handleTocClick = (href: string) => {
-    if (renditionRef.current) {
-      renditionRef.current.display(href)
-      setShowToc(false)
+  const handleTocClick = async (href: string) => {
+    if (renditionRef.current && !isNavigatingRef.current) {
+      isNavigatingRef.current = true
+      try {
+        const displayPromise = renditionRef.current.display(href)
+        const timeoutPromise = new Promise<void>((_, reject) =>
+          setTimeout(() => reject(new Error('TOC navigation timeout')), 5000)
+        )
+        await Promise.race([displayPromise, timeoutPromise])
+        setShowToc(false)
+      } catch (e) {
+        console.error('TOC click error:', e)
+      } finally {
+        isNavigatingRef.current = false
+      }
     }
   }
 

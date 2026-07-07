@@ -1,11 +1,5 @@
 import BooksSection from '../components/BooksSection'
-
-interface Book {
-  id: string
-  title: string
-  cover: string
-  epubPath: string | null
-}
+import { Book } from '../types'
 
 interface BooksPageProps {
   onSelectBook: (book: Book) => void

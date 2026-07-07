@@ -1,13 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Book } from '../types'
 import './BooksSection.css'
-
-interface Book {
-  id: string
-  title: string
-  cover: string
-  epubPath: string | null
-}
 
 interface BooksSectionProps {
   onSelectBook: (book: Book) => void

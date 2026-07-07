@@ -11,14 +11,8 @@ import EpisodesPage from './pages/EpisodesPage'
 import WorldPage from './pages/WorldPage'
 import BooksPage from './pages/BooksPage'
 import EPUBReader from './components/EPUBReader'
+import { Book } from './types'
 import './App.css'
-
-interface Book {
-  id: string
-  title: string
-  cover: string
-  epubPath: string | null
-}
 
 function App() {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
