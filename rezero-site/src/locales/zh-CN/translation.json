@@ -183,6 +183,7 @@
     "next": "下一页",
     "toc": "目录",
     "loading": "正在加载电子书...",
+    "paginating": "正在计算页数...",
     "nextPage": "下一页",
     "prevPage": "上一页",
     "hintLeft": "← 左箭头：翻到下一页（日式翻页）",
