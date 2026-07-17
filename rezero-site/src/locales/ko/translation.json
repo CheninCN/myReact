@@ -184,6 +184,7 @@
     "toc": "목차",
     "loading": "전자책을 로드 중...",
     "paginating": "페이지 계산 중...",
+    "noEpub": "EPUB 파일을 사용할 수 없습니다",
     "nextPage": "다음 페이지",
     "prevPage": "이전 페이지",
     "hintLeft": "← 왼쪽 화살표: 다음 페이지 (일본식 넘김)",

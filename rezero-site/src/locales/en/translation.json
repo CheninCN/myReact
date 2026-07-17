@@ -184,6 +184,7 @@
     "toc": "Table of Contents",
     "loading": "Loading eBook...",
     "paginating": "Calculating pages...",
+    "noEpub": "EPUB file not available",
     "nextPage": "Next Page",
     "prevPage": "Previous Page",
     "hintLeft": "← Left Arrow: Next Page (Japanese-style)",

@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Book as EpubBook, Rendition } from 'epubjs'
+import { EpubView } from 'react-reader'
 import { Book } from '../types'
 import './EPUBReader.css'
 
@@ -9,445 +9,208 @@ interface EPUBReaderProps {
   onClose: () => void
 }
 
-interface TOCItem {
-  id: string
-  label: string
-  href: string
-  level: number
-}
-
-interface PageMapEntry {
+interface SectionEntry {
   href: string
   startPage: number
-  pages: number
-  startPct: number
-  endPct: number
-}
-
-const CACHE_KEY_PREFIX = 'epub-pagemap-v1-'
-
-function getCacheKey(book: Book): string {
-  return CACHE_KEY_PREFIX + book.epubPath
-}
-
-function loadCachedPageMap(book: Book): { pageMap: PageMapEntry[]; totalPages: number } | null {
-  try {
-    const raw = localStorage.getItem(getCacheKey(book))
-    if (raw) return JSON.parse(raw)
-  } catch {}
-  return null
-}
-
-function savePageMapCache(book: Book, pageMap: PageMapEntry[], totalPages: number) {
-  try {
-    localStorage.setItem(getCacheKey(book), JSON.stringify({ pageMap, totalPages }))
-  } catch {}
-}
-
-async function prePaginateBook(
-  epubBook: EpubBook,
-  styleText: string,
-  width: number,
-  height: number,
-  onProgress: (pct: number, sectionName: string) => void,
-  abortRef: { current: boolean }
-): Promise<{ pageMap: PageMapEntry[]; totalPages: number }> {
-  const spine = (epubBook.spine as any).items as any[]
-  if (spine.length === 0) return { pageMap: [], totalPages: 0 }
-
-  const hiddenContainer = document.createElement('div')
-  hiddenContainer.style.cssText = `position:fixed;left:-10000px;top:0;width:${width}px;height:${height}px;overflow:hidden;visibility:hidden;pointer-events:none;z-index:-1;`
-  document.body.appendChild(hiddenContainer)
-
-  let totalChars = 0
-  const charCounts: number[] = []
-
-  for (const item of spine) {
-    if (abortRef.current) break
-    try {
-      const doc = await epubBook.section(item.href).load()
-      const cc = doc.body?.textContent?.length || 0
-      charCounts.push(cc)
-      totalChars += cc
-    } catch {
-      charCounts.push(0)
-    }
-  }
-
-  if (abortRef.current) {
-    document.body.removeChild(hiddenContainer)
-    return { pageMap: [], totalPages: 0 }
-  }
-
-  const pageMap: PageMapEntry[] = []
-  let cumulativePages = 0
-  let cumulativeChars = 0
-
-  for (let i = 0; i < spine.length; i++) {
-    if (abortRef.current) break
-    const item = spine[i]
-    const charCount = charCounts[i]
-
-    try {
-      const doc = await epubBook.section(item.href).load()
-
-      const iframe = document.createElement('iframe')
-      iframe.style.cssText = `width:${width}px;height:${height}px;border:none;`
-      hiddenContainer.appendChild(iframe)
-
-      const hiddenDoc = iframe.contentDocument
-      if (hiddenDoc) {
-        hiddenDoc.open()
-        hiddenDoc.write(
-          `<html><head><meta charset="utf-8"><style>${styleText}</style></head><body>${doc.body?.innerHTML || ''}</body></html>`
-        )
-        hiddenDoc.close()
-
-        await new Promise((r) => setTimeout(r, 80))
-
-        const hiddenBody = hiddenDoc.body
-        const scrollWidth = hiddenBody?.scrollWidth || 0
-        const computedCW = hiddenBody ? getComputedStyle(hiddenBody).columnWidth : 'auto'
-        const columnWidth =
-          computedCW && computedCW !== 'auto' ? parseInt(computedCW) : width
-        const pages = Math.max(1, Math.ceil(scrollWidth / Math.max(1, columnWidth)))
-
-        pageMap.push({
-          href: item.href,
-          startPage: cumulativePages + 1,
-          pages,
-          startPct: totalChars > 0 ? cumulativeChars / totalChars : 0,
-          endPct: totalChars > 0 ? (cumulativeChars + charCount) / totalChars : 0,
-        })
-
-        cumulativePages += pages
-        cumulativeChars += charCount
-        hiddenContainer.removeChild(iframe)
-      }
-    } catch {
-      const avgPages = Math.max(1, Math.round(cumulativePages / Math.max(1, pageMap.length)))
-      pageMap.push({
-        href: item.href,
-        startPage: cumulativePages + 1,
-        pages: avgPages,
-        startPct: totalChars > 0 ? cumulativeChars / totalChars : 0,
-        endPct: totalChars > 0 ? (cumulativeChars + charCount) / totalChars : 0,
-      })
-      cumulativePages += avgPages
-      cumulativeChars += charCount
-    }
-
-    onProgress(Math.round(((i + 1) / spine.length) * 100), item.href || `Section ${i + 1}`)
-    await new Promise((r) => setTimeout(r, 0))
-  }
-
-  document.body.removeChild(hiddenContainer)
-  return { pageMap, totalPages: cumulativePages }
-}
-
-function findVisualPage(
-  pageMap: PageMapEntry[],
-  location: any,
-  totalLocations: number,
-  epubBook: EpubBook
-): number {
-  if (pageMap.length === 0) return 1
-
-  let currentPct = location.start?.percentage
-  if (typeof currentPct !== 'number') {
-    const loc = epubBook.locations.locationFromCfi(location.start?.cfi)
-    currentPct = totalLocations > 0 ? Number(loc) / totalLocations : 0
-  }
-
-  const entry = pageMap.find((e) => currentPct >= e.startPct && currentPct < e.endPct)
-
-  if (entry) {
-    const range = entry.endPct - entry.startPct
-    const ratio = range > 0 ? (currentPct - entry.startPct) / range : 0
-    const pageInSection = Math.max(1, Math.ceil(ratio * entry.pages))
-    return entry.startPage + pageInSection - 1
-  }
-
-  const lastEntry = pageMap[pageMap.length - 1]
-  const totalPages = lastEntry.startPage + lastEntry.pages - 1
-  return Math.max(1, Math.ceil(currentPct * totalPages))
+  totalPages: number
+  charsCount: number
 }
 
 export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
   const { t } = useTranslation()
-  const [bookLoaded, setBookLoaded] = useState(false)
-  const [paginating, setPaginating] = useState(false)
-  const [paginationProgress, setPaginationProgress] = useState(0)
-  const [paginationSection, setPaginationSection] = useState('')
+  const [location, setLocation] = useState<string | number>(0)
+  const [showToc, setShowToc] = useState(false)
+  const [toc, setToc] = useState<any[]>([])
+  const [showControls, setShowControls] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
-  const [toc, setToc] = useState<TOCItem[]>([])
-  const [showToc, setShowToc] = useState(false)
-  const [showControls, setShowControls] = useState(true)
-  const bookRef = useRef<EpubBook | null>(null)
-  const renditionRef = useRef<Rendition | null>(null)
-  const pageMapRef = useRef<PageMapEntry[]>([])
-  const totalLocationsRef = useRef(0)
-  const pendingNavRef = useRef<'prev' | 'next' | null>(null)
-  const isNavigatingRef = useRef(false)
-  const abortRef = useRef(false)
+  const [sectionMap, setSectionMap] = useState<SectionEntry[]>([])
+  const [loading, setLoading] = useState(true)
+  const epubViewRef = useRef<any>(null)
+  const renditionRef = useRef<any>(null)
+  const sectionMapRef = useRef<SectionEntry[]>([])
+  const totalPagesRef = useRef(0)
 
-  const processNavigation = useCallback(async () => {
-    if (isNavigatingRef.current) return
-    if (!renditionRef.current) return
-    const action = pendingNavRef.current
-    if (!action) return
-
-    pendingNavRef.current = null
-    isNavigatingRef.current = true
-
-    const navPromise =
-      action === 'prev' ? renditionRef.current.prev() : renditionRef.current.next()
-    const timeoutPromise = new Promise<void>((_, reject) =>
-      setTimeout(() => reject(new Error('Navigation timeout')), 3000)
-    )
-
-    try {
-      await Promise.race([navPromise, timeoutPromise])
-    } catch (e) {
-      console.error(`Navigation ${action} failed:`, e)
-      if (renditionRef.current) {
-        try {
-          await renditionRef.current.display()
-        } catch {}
-      }
-    } finally {
-      isNavigatingRef.current = false
-      if (pendingNavRef.current) {
-        setTimeout(() => processNavigation(), 200)
-      }
-    }
-  }, [])
-
-  const loadBook = useCallback(async () => {
+  useEffect(() => {
     if (!book.epubPath) return
-    abortRef.current = false
 
-    try {
-      const epubBook = new EpubBook(book.epubPath)
-      bookRef.current = epubBook
-      await epubBook.ready
-
-      const navigation = await epubBook.loaded.navigation
-      const tocItems: TOCItem[] = []
-      const collectToc = (items: any[], level: number = 0) => {
-        items.forEach((item) => {
-          if (item.href) {
-            tocItems.push({
-              id: item.id || item.href,
-              label: item.label || item.href,
-              href: item.href,
-              level,
-            })
-            if (item.subitems) collectToc(item.subitems, level + 1)
-          }
-        })
-      }
-      collectToc(navigation.toc || [])
-      setToc(tocItems)
-
-      const rendition = epubBook.renderTo('epub-container', {
-        width: '100%',
-        height: '100%',
-        flow: 'paginated',
-        spread: 'none',
-      })
-      renditionRef.current = rendition
-
-      rendition.themes.default({
-        body: {
-          background: '#fff',
-          padding: '1.5em 2em',
-          'line-height': '1.8',
-          'font-size': '16px',
-        },
-        p: { 'text-indent': '2em', margin: '0.5em 0' },
-        img: { 'max-width': '100%', 'max-height': '90vh', height: 'auto', display: 'block', margin: '1rem auto' },
-        svg: { 'max-width': '100%', height: 'auto' },
-        video: { 'max-width': '100%', height: 'auto' },
-        h1: { margin: '1em 0 0.5em 0' },
-        h2: { margin: '1em 0 0.5em 0' },
-        h3: { margin: '1em 0 0.5em 0' },
-        h4: { margin: '1em 0 0.5em 0' },
-        h5: { margin: '1em 0 0.5em 0' },
-        h6: { margin: '1em 0 0.5em 0' },
-      })
-
-      rendition.hooks.content.register((contents: any) => {
-        const doc = contents.document
-        if (!doc) return
-        const style = doc.createElement('style')
-        style.textContent = `
-          * { word-break: keep-all; overflow-wrap: break-word; -webkit-hyphens: none; hyphens: none; }
-          html, body { user-select: none; -webkit-user-select: none; word-break: keep-all; line-break: strict; column-fill: auto; orphans: 2; widows: 2; }
-          img, svg, video, figure, table { break-inside: avoid; -webkit-column-break-inside: avoid; break-after: avoid; }
-          h1, h2, h3, h4, h5, h6 { break-after: avoid; -webkit-column-break-after: avoid; }
-        `
-        doc.head.appendChild(style)
-        doc.addEventListener('click', (e: MouseEvent) => {
-          e.preventDefault()
-          e.stopPropagation()
-          window.parent.postMessage({ type: 'epub-book-click' }, '*')
-        })
-      })
-
-      await rendition.display()
-      await new Promise<void>((resolve) => {
-        rendition.on('rendered', () => resolve())
-      })
-
-      await epubBook.locations.generate(160)
-      totalLocationsRef.current = epubBook.locations.length()
-
-      const containerEl = document.getElementById('epub-container')
-      const mainIframe = containerEl?.querySelector('iframe')
-      const mainDoc = mainIframe?.contentDocument
-      const styleTags = mainDoc?.head?.querySelectorAll('style') || []
-      const styleText = Array.from(styleTags).map((s) => s.textContent || '').join('\n')
-      const width = containerEl?.clientWidth || 800
-      const height = containerEl?.clientHeight || 600
-
-      const cached = loadCachedPageMap(book)
-      if (cached && cached.pageMap.length > 0) {
-        pageMapRef.current = cached.pageMap
-        setTotalPages(cached.totalPages)
-        setCurrentPage(1)
-        setBookLoaded(true)
-      } else {
-        setPaginating(true)
-        setPaginationProgress(0)
-
-        const { pageMap, totalPages } = await prePaginateBook(
-          epubBook,
-          styleText,
-          width,
-          height,
-          (pct, sectionName) => {
-            setPaginationProgress(pct)
-            setPaginationSection(sectionName)
-          },
-          abortRef
-        )
-
-        if (!abortRef.current && pageMap.length > 0) {
-          pageMapRef.current = pageMap
-          setTotalPages(totalPages)
-          setCurrentPage(1)
-          savePageMapCache(book, pageMap, totalPages)
+    const loadPageMap = async () => {
+      try {
+        const res = await fetch(`/api/paginate?book=${encodeURIComponent(book.epubPath!)}`)
+        const data = await res.json()
+        if (data.sectionMap) {
+          setSectionMap(data.sectionMap)
+          setTotalPages(data.totalPages)
+          sectionMapRef.current = data.sectionMap
+          totalPagesRef.current = data.totalPages
         }
-
-        setPaginating(false)
-        setBookLoaded(true)
+      } catch (err) {
+        console.error('Failed to load page map:', err)
+      } finally {
+        setLoading(false)
       }
-
-      rendition.on('relocated', (location: any) => {
-        if (location.start && pageMapRef.current.length > 0) {
-          const page = findVisualPage(
-            pageMapRef.current,
-            location,
-            totalLocationsRef.current,
-            epubBook
-          )
-          setCurrentPage(page)
-        }
-      })
-    } catch (error) {
-      console.error('Failed to load EPUB:', error)
-      setBookLoaded(true)
     }
+
+    loadPageMap()
   }, [book.epubPath])
 
-  useEffect(() => {
-    loadBook()
-    return () => {
-      abortRef.current = true
-      if (renditionRef.current) renditionRef.current.destroy()
-      if (bookRef.current) bookRef.current.destroy()
-    }
-  }, [loadBook])
+  const handleLocationChanged = useCallback((epubcfi: string) => {
+    setLocation(epubcfi)
+  }, [])
 
-  useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-      if (e.data?.type === 'epub-book-click') setShowControls(!showControls)
-    }
-    window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
-  }, [showControls])
+  const handleTocChange = useCallback((toc: any[]) => {
+    setToc(toc)
+  }, [])
 
-  const handlePrevPage = () => {
-    pendingNavRef.current = 'prev'
-    processNavigation()
-  }
+  const handleGetRendition = useCallback((rendition: any) => {
+    renditionRef.current = rendition
 
-  const handleNextPage = () => {
-    pendingNavRef.current = 'next'
-    processNavigation()
-  }
+    rendition.book.ready.then(() => {
+      rendition.book.locations.generate(16384).catch(() => {})
+    })
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+    rendition.hooks.content.register((contents: any) => {
+      const doc = contents.document
+      if (!doc) return
+      doc.addEventListener('click', (e: MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        window.parent.postMessage({ type: 'epub-book-click' }, '*')
+      })
+    })
+
+    rendition.themes.default({
+      body: {
+        'background': '#fff',
+        'padding': '1.5em 2em',
+        'line-height': '1.8',
+        'font-size': '16px',
+      },
+      p: {
+        'text-indent': '2em',
+        'margin': '0.5em 0',
+      },
+      img: {
+        'max-width': '100%',
+        'max-height': '90vh',
+        'height': 'auto',
+        'display': 'block',
+        'margin': '1rem auto',
+      },
+    })
+
+    rendition.hooks.content.register((contents: any) => {
+      const doc = contents.document
+      if (!doc) return
+      const style = doc.createElement('style')
+      style.textContent = `
+        * { word-break: keep-all; overflow-wrap: break-word; }
+        html, body { word-break: keep-all; line-break: strict; column-fill: auto; orphans: 2; widows: 2; }
+        img, svg, video { break-inside: avoid; break-after: avoid; }
+        h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+      `
+      doc.head.appendChild(style)
+    })
+
+    rendition.on('relocated', (loc: any) => {
+      if (loc.start && typeof loc.start.index === 'number') {
+        const sectionIndex = loc.start.index
+        const percentage = loc.start.percentage || 0
+        const map = sectionMapRef.current
+        const total = totalPagesRef.current
+
+        if (map[sectionIndex]) {
+          const section = map[sectionIndex]
+          const page = section.startPage + Math.floor(percentage * section.totalPages)
+          setCurrentPage(Math.max(1, Math.min(total, page)))
+        }
+      }
+    })
+  }, [])
+
+  const handlePrevPage = useCallback(async () => {
+    if (!renditionRef.current) return
+    try {
+      await renditionRef.current.prev()
+    } catch {}
+  }, [])
+
+  const handleNextPage = useCallback(async () => {
+    if (!renditionRef.current) return
+    try {
+      await renditionRef.current.next()
+    } catch {}
+  }, [])
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'ArrowLeft') handleNextPage()
     else if (e.key === 'ArrowRight') handlePrevPage()
     else if (e.key === 'Escape') onClose()
-  }
+  }, [handleNextPage, handlePrevPage, onClose])
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
+  }, [handleKeyDown])
 
-  const handleSliderChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const page = parseInt(e.target.value)
-    if (!bookRef.current || !renditionRef.current || pageMapRef.current.length === 0) return
-
-    const entry = pageMapRef.current.find(
-      (e) => page >= e.startPage && page < e.startPage + e.pages
-    )
-    if (entry) {
-      const pageInSection = page - entry.startPage + 0.5
-      const ratio = pageInSection / entry.pages
-      const targetPct = entry.startPct + ratio * (entry.endPct - entry.startPct)
-      const cfi = bookRef.current.locations.cfiFromPercentage(targetPct)
-      await renditionRef.current.display(cfi)
-    }
-  }
-
-  const handleTocClick = async (href: string) => {
-    if (renditionRef.current && !isNavigatingRef.current) {
-      isNavigatingRef.current = true
-      try {
-        await renditionRef.current.display(href)
-        setShowToc(false)
-      } catch (e) {
-        console.error('TOC click error:', e)
-      } finally {
-        isNavigatingRef.current = false
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'epub-book-click') {
+        setShowControls(prev => !prev)
       }
     }
-  }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
 
-  const handleLeftOverlayClick = (e: React.MouseEvent) => {
+  const handleSliderChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const page = parseInt(e.target.value)
+    const map = sectionMapRef.current
+    if (map.length === 0 || !renditionRef.current) return
+
+    for (let i = map.length - 1; i >= 0; i--) {
+      if (page >= map[i].startPage) {
+        await renditionRef.current.display(map[i].href)
+        break
+      }
+    }
+  }, [])
+
+  const handleTocClick = useCallback(async (href: string) => {
+    if (renditionRef.current) {
+      await renditionRef.current.display(href)
+      setShowToc(false)
+    }
+  }, [])
+
+  const handleLeftOverlayClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     handleNextPage()
-  }
+  }, [handleNextPage])
 
-  const handleRightOverlayClick = (e: React.MouseEvent) => {
+  const handleRightOverlayClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     handlePrevPage()
+  }, [handlePrevPage])
+
+  if (!book.epubPath) {
+    return (
+      <div className="epub-reader">
+        <div className="epub-reader__header epub-reader__header--visible">
+          <button className="epub-reader__close" onClick={onClose}>✕</button>
+          <h2 className="epub-reader__title">{book.title}</h2>
+        </div>
+        <div className="epub-reader__viewport">
+          <div style={{ color: '#fff', textAlign: 'center' }}>{t('books.noEpub')}</div>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="epub-reader">
-      <div
-        className={`epub-reader__header ${showControls ? 'epub-reader__header--visible' : ''}`}
-      >
-        <button className="epub-reader__close" onClick={onClose}>
-          ✕
-        </button>
+      <div className={`epub-reader__header ${showControls ? 'epub-reader__header--visible' : ''}`}>
+        <button className="epub-reader__close" onClick={onClose}>✕</button>
         <h2 className="epub-reader__title">{book.title}</h2>
         <div className="epub-reader__header-right">
           <button className="epub-reader__toc-btn" onClick={() => setShowToc(!showToc)}>
@@ -465,8 +228,8 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
         <div className="epub-reader__toc">
           <h3 className="epub-reader__toc-title">{t('books.toc')}</h3>
           <ul className="epub-reader__toc-list">
-            {toc.map((item) => (
-              <li key={item.id} className={`epub-reader__toc-item level-${item.level}`}>
+            {toc.map((item: any, index: number) => (
+              <li key={item.href || index} className={`epub-reader__toc-item level-${item.level || 0}`}>
                 <button onClick={() => handleTocClick(item.href)}>{item.label}</button>
               </li>
             ))}
@@ -476,35 +239,22 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
 
       <div className="epub-reader__viewport">
         <div className="epub-reader__book-wrapper">
-          <div
-            className="epub-reader__click-overlay epub-reader__click-overlay--left"
-            onClick={handleLeftOverlayClick}
-          />
-          <div id="epub-container" className="epub-container"></div>
-          <div
-            className="epub-reader__click-overlay epub-reader__click-overlay--right"
-            onClick={handleRightOverlayClick}
-          />
+          <div className="epub-reader__click-overlay epub-reader__click-overlay--left" onClick={handleLeftOverlayClick} />
+          <div className="epub-container">
+            <EpubView
+              ref={epubViewRef}
+              url={book.epubPath}
+              location={location}
+              locationChanged={handleLocationChanged}
+              tocChanged={handleTocChange}
+              epubOptions={{ flow: 'paginated', spread: 'none' }}
+              getRendition={handleGetRendition}
+            />
+          </div>
+          <div className="epub-reader__click-overlay epub-reader__click-overlay--right" onClick={handleRightOverlayClick} />
         </div>
 
-        {paginating && (
-          <div className="epub-reader__pagination-overlay">
-            <div className="epub-reader__pagination-content">
-              <div className="epub-reader__pagination-spinner"></div>
-              <p className="epub-reader__pagination-title">{t('books.paginating')}</p>
-              <div className="epub-reader__pagination-bar-track">
-                <div
-                  className="epub-reader__pagination-bar-fill"
-                  style={{ width: `${paginationProgress}%` }}
-                />
-              </div>
-              <p className="epub-reader__pagination-pct">{paginationProgress}%</p>
-              <p className="epub-reader__pagination-section">{paginationSection}</p>
-            </div>
-          </div>
-        )}
-
-        {!bookLoaded && !paginating && (
+        {loading && (
           <div className="epub-reader__loading">
             <div className="epub-reader__spinner"></div>
             <p>{t('books.loading')}</p>
@@ -512,16 +262,14 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
         )}
       </div>
 
-      <div
-        className={`epub-reader__slider-container ${showControls ? 'epub-reader__slider-container--visible' : ''}`}
-      >
+      <div className={`epub-reader__slider-container ${showControls ? 'epub-reader__slider-container--visible' : ''}`}>
         <input
           type="range"
           min="1"
           max={totalPages || 1}
           value={currentPage}
           onChange={handleSliderChange}
-          disabled={!bookLoaded || paginating}
+          disabled={totalPages === 0 || loading}
           className="epub-reader__slider"
         />
         <div className="epub-reader__slider-labels">
