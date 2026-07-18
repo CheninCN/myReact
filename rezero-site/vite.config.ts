@@ -22,7 +22,7 @@ export default defineConfig({
               return
             }
 
-            const bookPath = path.resolve(process.cwd(), 'public', book)
+            const bookPath = path.resolve(process.cwd(), 'public', book.replace(/^\/+/, ''))
 
             if (!fs.existsSync(bookPath)) {
               res.statusCode = 404

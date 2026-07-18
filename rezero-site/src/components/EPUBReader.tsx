@@ -9,12 +9,7 @@ interface EPUBReaderProps {
   onClose: () => void
 }
 
-interface SectionEntry {
-  href: string
-  startPage: number
-  totalPages: number
-  charsCount: number
-}
+const NAV_LOCK_MS = 500
 
 export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
   const { t } = useTranslation()
@@ -24,24 +19,22 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
   const [showControls, setShowControls] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
-  const [sectionMap, setSectionMap] = useState<SectionEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [sliderValue, setSliderValue] = useState(1)
   const epubViewRef = useRef<any>(null)
   const renditionRef = useRef<any>(null)
-  const sectionMapRef = useRef<SectionEntry[]>([])
   const totalPagesRef = useRef(0)
+  const sliderActiveRef = useRef(false)
+  const navLockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (!book.epubPath) return
-
     const loadPageMap = async () => {
       try {
         const res = await fetch(`/api/paginate?book=${encodeURIComponent(book.epubPath!)}`)
         const data = await res.json()
-        if (data.sectionMap) {
-          setSectionMap(data.sectionMap)
+        if (data.totalPages) {
           setTotalPages(data.totalPages)
-          sectionMapRef.current = data.sectionMap
           totalPagesRef.current = data.totalPages
         }
       } catch (err) {
@@ -50,9 +43,32 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
         setLoading(false)
       }
     }
-
     loadPageMap()
   }, [book.epubPath])
+
+  useEffect(() => {
+    if (!sliderActiveRef.current) {
+      setSliderValue(currentPage)
+    }
+  }, [currentPage])
+
+  const clearNavLock = useCallback(() => {
+    if (navLockTimerRef.current) {
+      clearTimeout(navLockTimerRef.current)
+      navLockTimerRef.current = null
+    }
+  }, [])
+
+  const setNavLock = useCallback(() => {
+    clearNavLock()
+    navLockTimerRef.current = setTimeout(() => {
+      navLockTimerRef.current = null
+    }, NAV_LOCK_MS)
+  }, [clearNavLock])
+
+  const isNavLocked = useCallback(() => {
+    return navLockTimerRef.current !== null
+  }, [])
 
   const handleLocationChanged = useCallback((epubcfi: string) => {
     setLocation(epubcfi)
@@ -62,12 +78,29 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
     setToc(toc)
   }, [])
 
+  const goToPage = useCallback((page: number) => {
+    const rend = renditionRef.current
+    if (!rend?.book?.locations || totalPagesRef.current <= 0) return
+    if (isNavLocked()) return
+
+    setNavLock()
+    const pct = (Math.max(1, Math.min(page, totalPagesRef.current)) - 1) / totalPagesRef.current
+    const cfi = rend.book.locations.cfiFromPercentage(pct)
+    if (!cfi) return
+
+    rend.display(cfi).catch(() => {})
+  }, [isNavLock, setNavLock])
+
   const handleGetRendition = useCallback((rendition: any) => {
     renditionRef.current = rendition
 
     rendition.book.ready.then(() => {
-      rendition.book.locations.generate(16384).catch(() => {})
-    })
+      return rendition.book.locations.generate(1024)
+    }).then(() => {
+      if (rendition.book.locations.length() === 0) {
+        return rendition.book.locations.generate(512)
+      }
+    }).catch(() => {})
 
     rendition.hooks.content.register((contents: any) => {
       const doc = contents.document
@@ -80,23 +113,9 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
     })
 
     rendition.themes.default({
-      body: {
-        'background': '#fff',
-        'padding': '1.5em 2em',
-        'line-height': '1.8',
-        'font-size': '16px',
-      },
-      p: {
-        'text-indent': '2em',
-        'margin': '0.5em 0',
-      },
-      img: {
-        'max-width': '100%',
-        'max-height': '90vh',
-        'height': 'auto',
-        'display': 'block',
-        'margin': '1rem auto',
-      },
+      body: { 'background': '#fff', 'padding': '1.5em 2em', 'line-height': '1.8', 'font-size': '16px' },
+      p: { 'text-indent': '2em', 'margin': '0.5em 0' },
+      img: { 'max-width': '100%', 'max-height': '90vh', 'height': 'auto', 'display': 'block', 'margin': '1rem auto' },
     })
 
     rendition.hooks.content.register((contents: any) => {
@@ -113,38 +132,27 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
     })
 
     rendition.on('relocated', (loc: any) => {
-      if (loc.start && typeof loc.start.index === 'number') {
-        const sectionIndex = loc.start.index
-        const percentage = loc.start.percentage || 0
-        const map = sectionMapRef.current
-        const total = totalPagesRef.current
-
-        if (map[sectionIndex]) {
-          const section = map[sectionIndex]
-          const page = section.startPage + Math.floor(percentage * section.totalPages)
-          setCurrentPage(Math.max(1, Math.min(total, page)))
-        }
+      if (!loc?.start) return
+      const total = totalPagesRef.current
+      const pct = loc.start.percentage
+      if (typeof pct === 'number' && pct >= 0 && total > 0) {
+        const page = Math.max(1, Math.min(total, Math.floor(pct * total) + 1))
+        setCurrentPage(page)
       }
     })
   }, [])
 
-  const handlePrevPage = useCallback(async () => {
-    if (!renditionRef.current) return
-    try {
-      await renditionRef.current.prev()
-    } catch {}
-  }, [])
+  const handlePrevPage = useCallback(() => {
+    if (currentPage > 1) goToPage(currentPage - 1)
+  }, [currentPage, goToPage])
 
-  const handleNextPage = useCallback(async () => {
-    if (!renditionRef.current) return
-    try {
-      await renditionRef.current.next()
-    } catch {}
-  }, [])
+  const handleNextPage = useCallback(() => {
+    if (currentPage < totalPagesRef.current) goToPage(currentPage + 1)
+  }, [goToPage])
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'ArrowLeft') handleNextPage()
-    else if (e.key === 'ArrowRight') handlePrevPage()
+    if (e.key === 'ArrowLeft') { e.preventDefault(); handleNextPage() }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); handlePrevPage() }
     else if (e.key === 'Escape') onClose()
   }, [handleNextPage, handlePrevPage, onClose])
 
@@ -163,18 +171,18 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
     return () => window.removeEventListener('message', handleMessage)
   }, [])
 
-  const handleSliderChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const page = parseInt(e.target.value)
-    const map = sectionMapRef.current
-    if (map.length === 0 || !renditionRef.current) return
-
-    for (let i = map.length - 1; i >= 0; i--) {
-      if (page >= map[i].startPage) {
-        await renditionRef.current.display(map[i].href)
-        break
-      }
-    }
+  const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSliderValue(parseInt(e.target.value))
   }, [])
+
+  const handleSliderDragStart = useCallback(() => {
+    sliderActiveRef.current = true
+  }, [])
+
+  const handleSliderDragEnd = useCallback(() => {
+    sliderActiveRef.current = false
+    goToPage(sliderValue)
+  }, [sliderValue, goToPage])
 
   const handleTocClick = useCallback(async (href: string) => {
     if (renditionRef.current) {
@@ -267,13 +275,17 @@ export default function EPUBReader({ book, onClose }: EPUBReaderProps) {
           type="range"
           min="1"
           max={totalPages || 1}
-          value={currentPage}
+          value={sliderValue}
           onChange={handleSliderChange}
+          onMouseDown={handleSliderDragStart}
+          onTouchStart={handleSliderDragStart}
+          onMouseUp={handleSliderDragEnd}
+          onTouchEnd={handleSliderDragEnd}
           disabled={totalPages === 0 || loading}
           className="epub-reader__slider"
         />
         <div className="epub-reader__slider-labels">
-          <span>1</span>
+          <span>{sliderValue}</span>
           <span>{totalPages}</span>
         </div>
       </div>

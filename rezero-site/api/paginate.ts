@@ -11,7 +11,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const protocol = req.headers['x-forwarded-proto'] || 'https'
     const host = req.headers['x-forwarded-host'] || req.headers.host
-    const epubUrl = `${protocol}://${host}/${book}`
+    const epubUrl = `${protocol}://${host}/${book.replace(/^\/+/, '')}`
 
     const response = await fetch(epubUrl)
     if (!response.ok) {

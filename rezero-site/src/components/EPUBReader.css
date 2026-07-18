@@ -160,7 +160,7 @@
   align-items: center;
   justify-content: center;
   background: #1a1a2e;
-  padding: 60px 1rem 70px 1rem;
+  padding: 60px 1rem 90px 1rem;
   box-sizing: border-box;
   min-height: 0;
 }
@@ -303,7 +303,7 @@
   }
 
   .epub-reader__viewport {
-    padding: 50px 0.5rem 60px 0.5rem;
+    padding: 50px 0.5rem 80px 0.5rem;
   }
 
   .epub-reader__book-wrapper {
